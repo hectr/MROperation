@@ -1,0 +1,3 @@
+language: objective-c
+xcode_project: MROperation.xcodeproj
+xcode_scheme: MROperation-iOS
