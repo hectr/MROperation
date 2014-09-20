@@ -8,7 +8,7 @@
 
 You can use `MROperation` objects directly. But you can also implement your own subclasses. See, for instance, how you could create a custom subclass for performing reverse-geocoding requests:
 
-```
+```objc
 // MROperation subclass that performs reverse-geocoding requests.
 @interface GeocodingRequestOperation : MROperation
 
@@ -36,7 +36,7 @@ You can use `MROperation` objects directly. But you can also implement your own 
 
 And here's how you would execute them:
 
-```
+```objc
 // Set up a queue:
 _geocodingQueue = [[NSOperationQueue alloc] init];
 _geocodingQueue.maxConcurrentOperationCount = 1;
