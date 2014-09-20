@@ -67,7 +67,7 @@ typedef NSUInteger MRBackgroundTaskIdentifier;
 
 #pragma mark Private class methods
 
-+ (BOOL)stateTransitionIsValidFrom:(MROperationState const)fromState
++ (BOOL)mr_stateTransitionIsValidFrom:(MROperationState const)fromState
                                 to:(MROperationState const)toState
                          cancelled:(BOOL const)isCancelled
 {
@@ -96,7 +96,7 @@ typedef NSUInteger MRBackgroundTaskIdentifier;
     }
 }
 
-+ (NSString *)keyPathFromOperationState:(MROperationState const)state
++ (NSString *)mr_keyPathFromOperationState:(MROperationState const)state
 {
     switch (state) {
         case MROperationReadyState:
@@ -133,12 +133,20 @@ typedef NSUInteger MRBackgroundTaskIdentifier;
 
 #pragma mark Private instance methods
 
-- (void)postNotificationWithName:(NSString *const)name
+- (void)mr_postNotificationWithName:(NSString *const)name
 {
     dispatch_async(self.notificationQueue ?: dispatch_get_main_queue(), ^{
         NSNotificationCenter *const center = NSNotificationCenter.defaultCenter;
         [center postNotificationName:name object:self];
     });
+}
+
+- (NSError *)mr_cancelledError
+{
+    NSError *const error = [NSError errorWithDomain:NSCocoaErrorDomain
+                                               code:NSUserCancelledError
+                                           userInfo:nil];
+    return error;
 }
 
 #pragma mark Public instance methods
@@ -211,10 +219,10 @@ typedef NSUInteger MRBackgroundTaskIdentifier;
     [self.lock lock];
     Class const selfClass = self.class;
     BOOL const isCancelled = self.isCancelled;
-    if ([selfClass stateTransitionIsValidFrom:self.state to:toState cancelled:isCancelled]) {
+    if ([selfClass mr_stateTransitionIsValidFrom:self.state to:toState cancelled:isCancelled]) {
         MROperationState fromState = self.state;
-        NSString *const fromKey = [selfClass keyPathFromOperationState:fromState];
-        NSString *const toKey = [selfClass keyPathFromOperationState:toState];
+        NSString *const fromKey = [selfClass mr_keyPathFromOperationState:fromState];
+        NSString *const toKey = [selfClass mr_keyPathFromOperationState:toState];
         [self willChangeValueForKey:toKey];
         [self willChangeValueForKey:fromKey];
         _state = toState;
@@ -342,7 +350,7 @@ typedef NSUInteger MRBackgroundTaskIdentifier;
     }
     self.state = MROperationFinishedState;
     [self.lock unlock];
-    [self postNotificationWithName:MROperationDidFinishNotification];
+    [self mr_postNotificationWithName:MROperationDidFinishNotification];
 }
 
 #pragma mark - NSOperation
@@ -392,7 +400,7 @@ typedef NSUInteger MRBackgroundTaskIdentifier;
         [self.lock unlock];
         if (block) {
             block(self);
-            [self postNotificationWithName:MROperationDidStartNotification];
+            [self mr_postNotificationWithName:MROperationDidStartNotification];
         }
     } else {
         [self.lock unlock];
@@ -403,7 +411,7 @@ typedef NSUInteger MRBackgroundTaskIdentifier;
 {
     [self.lock lock];
     if (!self.isFinished && !self.isCancelled) {
-        self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil];
+        self.error = self.mr_cancelledError;
         [super cancel];
         void (^const block)(id<MRExecutingOperation>) = self.onCancelBlock;
         [self.lock unlock];
@@ -423,7 +431,7 @@ typedef NSUInteger MRBackgroundTaskIdentifier;
     return [NSString stringWithFormat:@"<%@: %p, state: %@, cancelled: %@>"
             , NSStringFromClass(self.class)
             , self
-            , [self.class keyPathFromOperationState:self.state]
+            , [self.class mr_keyPathFromOperationState:self.state]
             , (self.isCancelled ? @"YES" : @"NO")];
 }
 
