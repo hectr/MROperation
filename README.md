@@ -4,7 +4,17 @@
 
 `NSOperation` subclass that manages the concurrent execution of a block.
 
-# Example
+## Installation
+
+### From CocoaPods
+
+Add `pod 'MROperation'` to your *Podfile*.
+
+### Manually
+
+Drag the *MROperation* folder into your project.
+
+## Usage
 
 You can use `MROperation` objects directly. But you can also implement your own subclasses. See, for instance, how you could create a custom subclass for performing reverse-geocoding requests:
 
@@ -54,4 +64,4 @@ GeocodingRequestOperation *o = [GeocodingRequestOperation operationWithLocation:
 
 ## License
 
-**MROperation** is available under the MIT license. See the LICENSE file for more info.
+**MROperation** is available under the MIT license. See the *LICENSE* file for more info.
