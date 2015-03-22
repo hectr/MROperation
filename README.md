@@ -1,4 +1,7 @@
 [![Build Status](https://travis-ci.org/hectr/MROperation.svg)](https://travis-ci.org/hectr/MROperation)
+[![Version](https://img.shields.io/cocoapods/v/MROperation.svg?style=flat)](http://cocoadocs.org/docsets/MROperation)
+[![License](https://img.shields.io/cocoapods/l/MROperation.svg?style=flat)](http://cocoadocs.org/docsets/MROperation)
+[![Platform](https://img.shields.io/cocoapods/p/MROperation.svg?style=flat)](http://cocoadocs.org/docsets/MROperation)
 
 # MROperation
 
