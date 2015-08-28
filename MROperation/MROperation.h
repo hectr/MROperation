@@ -40,6 +40,45 @@ extern NSString *const MROperationDidFinishNotification;
 
 
 /**
+ A protocol that represents a concrete operation.
+ */
+@protocol MRConcreteOperation <NSObject>
+
+/**
+ Returns the receiver's `userInfo`.
+ 
+ @return The user info dictionary.
+ */
+- (NSDictionary *)userInfo;
+
+/**
+ Returns a `BOOL` value indicating whether the executing operation is currently
+ executing.
+ 
+ @return `YES` if the operation is executing; otherwise, `NO`.
+ */
+- (BOOL)isExecuting;
+
+/**
+ Returns a `BOOL` value indicating whether the executing operation is done
+ executing.
+ 
+ @return `YES` if the operation is no longer executing; otherwise, `NO`.
+ */
+- (BOOL)isFinished;
+
+/**
+ Returns a `BOOL` value indicating whether the executing operation has been
+ cancelled.
+ 
+ @return `YES` if the operation was cancelled; otherwise, `NO`.
+ */
+- (BOOL)isCancelled;
+
+@end
+
+
+/**
  The `MROperation` class is a concrete subclass of `NSOperation` that manages
  the concurrent execution of a block.
  
@@ -47,7 +86,7 @@ extern NSString *const MROperationDidFinishNotification;
  executing, but when it is explicitly finished by invoking `finishWithError:` on
  the blocks parameter.
  */
-@interface MROperation : NSOperation
+@interface MROperation : NSOperation <MRConcreteOperation>
 
 #if defined(COREANIMATION_H) & defined(__OBJC__)
 
@@ -132,20 +171,20 @@ extern NSString *const MROperationDidFinishNotification;
 #endif
 
 /**
- Sets the `completionBlock` property with a block that executes either the 
- specified success or failure block, depending on the `error` property of the 
- receiver. If `error` returns a value then `failure` is executed. Otherwise, 
+ Sets the `completionBlock` property with a block that executes either the
+ specified success or failure block, depending on the `error` property of the
+ receiver. If `error` returns a value then `failure` is executed. Otherwise,
  `success` is executed.
  
- @param success The block to be executed on the completion of a successful 
+ @param success The block to be executed on the completion of a successful
  operation. This block has no return value and takes one argument: the receiver
  operation.
- @param failure The block to be executed on the completion of an unsuccessful 
+ @param failure The block to be executed on the completion of an unsuccessful
  operation. This block has no return value and takes two arguments: the receiver
  operation and the error that occurred during the operation execution.
  */
-- (void)setCompletionBlockWithSuccess:(void (^)(MROperation *operation))success
-                              failure:(void (^)(MROperation *operation, NSError *error))failure;
+- (void)setCompletionBlockWithSuccess:(void (^)(id<MRConcreteOperation> operation))success
+                              failure:(void (^)(id<MRConcreteOperation> operation, NSError *error))failure;
 
 @end
 
@@ -155,7 +194,7 @@ extern NSString *const MROperationDidFinishNotification;
  
  See `initWithBlock:`.
  */
-@protocol MRExecutingOperation <NSObject>
+@protocol MRExecutingOperation <MRConcreteOperation>
 
 /**
  Use this method for finishing the receiver with the given error.
@@ -169,29 +208,5 @@ extern NSString *const MROperationDidFinishNotification;
  Advises the executing operation object that it should stop executing its task.
  */
 - (void)cancel;
-
-/**
- Returns a `BOOL` value indicating whether the executing operation is currently
- executing.
- 
- @return `YES` if the operation is executing; otherwise, `NO`.
- */
-- (BOOL)isExecuting;
-
-/**
- Returns a `BOOL` value indicating whether the executing operation is done
- executing.
- 
- @return `YES` if the operation is no longer executing; otherwise, `NO`.
- */
-- (BOOL)isFinished;
-
-/**
- Returns a `BOOL` value indicating whether the executing operation has been
- cancelled.
- 
- @return `YES` if the operation was cancelled; otherwise, `NO`.
- */
-- (BOOL)isCancelled;
 
 @end

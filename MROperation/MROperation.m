@@ -165,8 +165,8 @@ typedef NSUInteger MRBackgroundTaskIdentifier;
     return self;
 }
 
-- (void)setCompletionBlockWithSuccess:(void (^const)(MROperation *))success
-                              failure:(void (^const)(MROperation *, NSError *error))failure
+- (void)setCompletionBlockWithSuccess:(void (^const)(id<MRConcreteOperation>))success
+                              failure:(void (^const)(id<MRConcreteOperation>, NSError *error))failure
 {
     [self.lock lock];
     __weak __typeof(self) const weakSelf = self;
